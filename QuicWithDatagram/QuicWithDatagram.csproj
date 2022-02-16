@@ -1,0 +1,107 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0</TargetFrameworks>
+		<RuntimeIdentifiers>win;linux;osx</RuntimeIdentifiers>
+		<ExtrasBuildEachRuntimeIdentifier>true</ExtrasBuildEachRuntimeIdentifier>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AssemblyName>FlyByWireless.Quic</AssemblyName>
+		<VersionSuffix>alpha.1</VersionSuffix>
+		<Authors>WONG Tin Chi Timothy</Authors>
+		<Product>MsQuic Wrapper with Datagram</Product>
+		<Title>$(Product)</Title>
+		<Description>QUIC implementation derived from .NET and extended with datagram.</Description>
+		<PackageTags>quic msquic datagram</PackageTags>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/wegylexy/quic-with-datagram.git</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DefineConstants Condition="'$(RuntimeIdentifier)' == 'osx'">$(DefineConstants);SOCKADDR_HAS_LENGTH</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../LICENSE" Pack="true" PackagePath="" />
+		<ReferenceAssemblyProjectReference Include="../ref/QuicWithDatagram/QuicWithDatagram.csproj"/>
+		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.Windows.cs" Condition="'$(RuntimeIdentifier)' != 'win'" />
+		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.Linux.cs" Condition="'$(RuntimeIdentifier)' != 'linux'" />
+		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.OSX.cs" Condition="'$(RuntimeIdentifier)' != 'osx'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Resources/SR.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>SR.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Resources/SR.resx">
+			<CustomToolNamespace>System.Net.Quic</CustomToolNamespace>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>SR.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="msquic/win-x64/msquic.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-x64/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-x86/msquic.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-x86/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-arm64/msquic.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-arm64/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-arm/msquic.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-arm/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-x64/msquic-openssl.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-x64/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-x86/msquic-openssl.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-x86/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-arm64/msquic-openssl.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-arm64/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/win-arm/msquic-openssl.dll">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/win-arm/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/linux-x64/libmsquic.so">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/linux-x64/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/linux-x64/libmsquic.lttng.so">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/linux-x64/native/</PackagePath>
+		</Content>
+		<Content Include="msquic/osx/libmsquic.dylib">
+			<Pack>True</Pack>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<PackagePath>runtimes/osx-x64/native/</PackagePath>
+		</Content>
+	</ItemGroup>
+</Project>
