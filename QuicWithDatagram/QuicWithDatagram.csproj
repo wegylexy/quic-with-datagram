@@ -8,7 +8,7 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AssemblyName>FlyByWireless.Quic</AssemblyName>
-		<VersionSuffix>alpha.1</VersionSuffix>
+		<VersionSuffix>alpha.2</VersionSuffix>
 		<Authors>WONG Tin Chi Timothy</Authors>
 		<Product>MsQuic Wrapper with Datagram</Product>
 		<Title>$(Product)</Title>

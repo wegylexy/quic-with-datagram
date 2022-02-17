@@ -129,20 +129,7 @@ namespace System.Net.Quic.Implementations.MsQuic.Internal
 
         static MsQuicApi()
         {
-            nint msQuicHandle;
-            // Registers to resolve architecture-specific DLLs on Windows
-            if (OperatingSystem.IsWindows())
-            {
-                [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-                static extern nint LoadLibrary([MarshalAs(UnmanagedType.LPWStr)] string fileName);
-
-                msQuicHandle = LoadLibrary(Path.Join(Path.GetDirectoryName(Environment.ProcessPath), "msquic" + (IsWindowsVersionSupported() ? null : "-openssl")));
-            }
-            else
-            {
-                NativeLibrary.TryLoad("msquic", typeof(MsQuicApi).Assembly, DllImportSearchPath.AssemblyDirectory, out msQuicHandle);
-            }
-            if (msQuicHandle != default)
+            if (NativeLibrary.TryLoad("msquic" + (IsWindowsVersionSupported() || !OperatingSystem.IsWindows() ? null : "-openssl"), typeof(MsQuicApi).Assembly, DllImportSearchPath.AssemblyDirectory, out var msQuicHandle) && msQuicHandle != default)
             {
                 try
                 {
