@@ -129,7 +129,7 @@ namespace System.Net.Quic.Implementations.MsQuic.Internal
 
         static MsQuicApi()
         {
-            if (NativeLibrary.TryLoad("msquic" + (IsWindowsVersionSupported() || !OperatingSystem.IsWindows() ? null : "-openssl"), typeof(MsQuicApi).Assembly, DllImportSearchPath.AssemblyDirectory, out var msQuicHandle) && msQuicHandle != default)
+            if (NativeLibrary.TryLoad("msquic" + (!OperatingSystem.IsWindows() || IsSchannel() ? null : "-openssl"), typeof(MsQuicApi).Assembly, DllImportSearchPath.AssemblyDirectory, out var msQuicHandle) && msQuicHandle != default)
             {
                 try
                 {
@@ -156,8 +156,10 @@ namespace System.Net.Quic.Implementations.MsQuic.Internal
             }
         }
 
-        internal static bool IsWindowsVersionSupported() => OperatingSystem.IsWindowsVersionAtLeast(MinWindowsVersion.Major,
-            MinWindowsVersion.Minor, MinWindowsVersion.Build, MinWindowsVersion.Revision);
+        private static bool? _IsWindowsVersionSupported;
+        internal static bool IsSchannel() => _IsWindowsVersionSupported ??=
+            Environment.GetEnvironmentVariable("QUIC_NO_SCHANNEL") != "true" &&
+            OperatingSystem.IsWindowsVersionAtLeast(MinWindowsVersion.Major, MinWindowsVersion.Minor, MinWindowsVersion.Build, MinWindowsVersion.Revision);
 
         // TODO: Consider updating all of these delegates to instead use function pointers.
         internal RegistrationOpenDelegate RegistrationOpenDelegate { get; }

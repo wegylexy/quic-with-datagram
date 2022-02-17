@@ -133,7 +133,7 @@ namespace System.Net.Quic.Implementations.MsQuic.Internal
                 flags |= QUIC_CREDENTIAL_FLAGS.INDICATE_CERTIFICATE_RECEIVED | QUIC_CREDENTIAL_FLAGS.NO_CERTIFICATE_VALIDATION;
             }
 
-            if (!MsQuicApi.IsWindowsVersionSupported())
+            if (!MsQuicApi.IsSchannel())
             {
                 // Use certificate handles on Windows, fall-back to ASN1 otherwise.
                 flags |= QUIC_CREDENTIAL_FLAGS.USE_PORTABLE_CERTIFICATES;
@@ -213,7 +213,7 @@ namespace System.Net.Quic.Implementations.MsQuic.Internal
 
                 if (certificate != null)
                 {
-                    if (OperatingSystem.IsWindows())
+                    if (MsQuicApi.IsSchannel())
                     {
                         config.Type = QUIC_CREDENTIAL_TYPE.CONTEXT;
                         config.Certificate = certificate.Handle;

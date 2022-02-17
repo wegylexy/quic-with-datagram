@@ -410,7 +410,7 @@ namespace System.Net.Quic.Implementations.MsQuic
             {
                 if (connectionEvent.Data.PeerCertificateReceived.PlatformCertificateHandle != IntPtr.Zero)
                 {
-                    if (MsQuicApi.IsWindowsVersionSupported())
+                    if (MsQuicApi.IsSchannel())
                     {
                         certificate = new X509Certificate2(connectionEvent.Data.PeerCertificateReceived.PlatformCertificateHandle);
                     }

@@ -8,7 +8,7 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AssemblyName>FlyByWireless.Quic</AssemblyName>
-		<VersionSuffix>alpha.2</VersionSuffix>
+		<VersionSuffix>alpha.3</VersionSuffix>
 		<Authors>WONG Tin Chi Timothy</Authors>
 		<Product>MsQuic Wrapper with Datagram</Product>
 		<Title>$(Product)</Title>
@@ -25,7 +25,7 @@
 
 	<ItemGroup>
 		<None Include="../LICENSE" Pack="true" PackagePath="" />
-		<ReferenceAssemblyProjectReference Include="../ref/QuicWithDatagram/QuicWithDatagram.csproj"/>
+		<ReferenceAssemblyProjectReference Include="../ref/QuicWithDatagram/QuicWithDatagram.csproj" />
 		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.Windows.cs" Condition="'$(RuntimeIdentifier)' != 'win'" />
 		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.Linux.cs" Condition="'$(RuntimeIdentifier)' != 'linux'" />
 		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.OSX.cs" Condition="'$(RuntimeIdentifier)' != 'osx'" />
