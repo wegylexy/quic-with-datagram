@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Buffers;
 using System.Diagnostics;
 using System.Net.Quic.Implementations.MsQuic.Internal;
 using System.Net.Security;
@@ -133,7 +134,7 @@ namespace System.Net.Quic.Implementations.MsQuic
                     _closing = true;
                 }
             }
-            
+
             public CancellationTokenSource Abort = new();
 
             public event QuicDatagramReceivedEventHandler? DatagramReceived;
@@ -526,22 +527,9 @@ namespace System.Net.Quic.Implementations.MsQuic
         {
             var datagramState = connectionEvent.Data.DatagramSendStateChanged.State;
             GCHandle handle = GCHandle.FromIntPtr(connectionEvent.Data.DatagramSendStateChanged.ClientContext);
-            if (handle.Target is TaskCompletionSource<QUIC_DATAGRAM_SEND_STATE> source)
-            {
-                switch (datagramState)
-                {
-                    case QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_LOST_DISCARDED:
-                    case QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_ACKNOWLEDGED:
-                    case QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_ACKNOWLEDGED_SPURIOUS:
-                    case QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_CANCELED:
-                        source.TrySetResult(datagramState);
-                        break;
-                    default:
-                        break;
-                }
-                return MsQuicStatusCodes.Success;
-            }
-            return MsQuicStatusCodes.InvalidState;
+            return handle.Target is Func<QUIC_DATAGRAM_SEND_STATE, bool> callback && callback(datagramState) ?
+                MsQuicStatusCodes.Success :
+                MsQuicStatusCodes.InvalidState;
         }
 
         internal override async ValueTask<QuicStreamProvider> AcceptStreamAsync(CancellationToken cancellationToken = default)
@@ -967,43 +955,93 @@ namespace System.Net.Quic.Implementations.MsQuic
             remove => _state.DatagramReceived -= value;
         }
 
-        internal override async ValueTask<bool> SendDatagramAsync(ReadOnlyMemory<byte> buffer, bool priority)
+        internal override Task<QuicDatagramSendingResult> SendDatagramAsync(ReadOnlyMemory<byte> buffer, bool priority)
         {
-            TaskCompletionSource<QUIC_DATAGRAM_SEND_STATE> tcs = new();
-            var tcsHandle = GCHandle.Alloc(tcs);
-            using var handle = buffer.Pin();
-            var quicBuffer = new QuicBuffer[1];
-            quicBuffer[0].Length = (uint)buffer.Length;
-            unsafe { quicBuffer[0].Buffer = (byte*)handle.Pointer; }
-            var quicBufferHandle = GCHandle.Alloc(quicBuffer, GCHandleType.Pinned);
+            return SendDatagramAsync(new ReadOnlySequence<byte>(buffer), priority);
+        }
+
+        internal unsafe override Task<QuicDatagramSendingResult> SendDatagramAsync(ReadOnlySequence<byte> buffers, bool priority)
+        {
+            TaskCompletionSource<QuicDatagramSendingResult> sent = new();
+            TaskCompletionSource completion = new(), lostSuspect = new();
+            Func<QUIC_DATAGRAM_SEND_STATE, bool> callback = state => state switch
+            {
+                QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SENT =>
+                    sent.TrySetResult(new(completion.Task, lostSuspect.Task)),
+                QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_LOST_SUSPECT =>
+                    lostSuspect.TrySetException(new TimeoutException()),
+                QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_LOST_DISCARDED =>
+                    completion.TrySetException(new TimeoutException()),
+                QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_ACKNOWLEDGED or
+                QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_ACKNOWLEDGED_SPURIOUS =>
+                    lostSuspect.TrySetResult() | completion.TrySetResult(),
+                QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_CANCELED =>
+                    sent.TrySetCanceled() | lostSuspect.TrySetCanceled() | completion.TrySetCanceled(),
+                _ => false
+            };
+            var count = 0;
+            foreach (var buffer in buffers)
+            {
+                ++count;
+            }
+            var handles = new MemoryHandle[count];
+            nint quicBuffers;
+            var callbackHandle = GCHandle.Alloc(callback);
             try
             {
-                unsafe
+                quicBuffers = Marshal.AllocHGlobal(sizeof(QuicBuffer) * count);
+                try
                 {
-                    var status = MsQuicApi.Api.DatagramSendDelegate(
-                        _state.Handle,
-                        (QuicBuffer*)Marshal.UnsafeAddrOfPinnedArrayElement(quicBuffer, 0),
-                        1,
-                        priority ? QUIC_SEND_FLAGS.DGRAM_PRIORITY : QUIC_SEND_FLAGS.NONE,
-                        (IntPtr)tcsHandle);
-                    QuicExceptionHelpers.ThrowIfFailed(status, "Failed to send a datagram to peer.");
+                    completion.Task.ContinueWith(task =>
+                    {
+                        foreach (var handle in handles)
+                        {
+                            using (handle) { }
+                        }
+                        Marshal.FreeHGlobal(quicBuffers);
+                        callbackHandle.Free();
+                    });
+                    try
+                    {
+                        var pointer = (QuicBuffer*)quicBuffers;
+                        count = 0;
+                        foreach (var buffer in buffers)
+                        {
+                            var handle = buffer.Pin();
+                            pointer[count].Length = (uint)buffer.Length;
+                            pointer[count].Buffer = (byte*)handle.Pointer;
+                            handles[count] = handle;
+                            ++count;
+                        }
+                        var status = MsQuicApi.Api.DatagramSendDelegate(
+                            _state.Handle,
+                            pointer,
+                            (uint)count,
+                            priority ? QUIC_SEND_FLAGS.DGRAM_PRIORITY : QUIC_SEND_FLAGS.NONE,
+                            (IntPtr)callbackHandle);
+                        QuicExceptionHelpers.ThrowIfFailed(status, "Failed to send a datagram to peer.");
+                    }
+                    catch 
+                    {
+                        foreach (var handle in handles)
+                        {
+                            using (handle) { }
+                        }
+                        throw;
+                    }
                 }
-                using var abort = _state.Abort.Token.Register(() => tcs.SetException(ThrowHelper.GetConnectionAbortedException(_state.AbortErrorCode)));
-                var state = await tcs.Task.ConfigureAwait(false);
-                return state switch
+                catch 
                 {
-                    QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_ACKNOWLEDGED => true,
-                    QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_ACKNOWLEDGED_SPURIOUS => false,
-                    QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_CANCELED => throw new OperationCanceledException("Datagram send canceled."),
-                    QUIC_DATAGRAM_SEND_STATE.QUIC_DATAGRAM_SEND_LOST_DISCARDED => throw new QuicDatagramException("Datagram lost discarded.", (int)state),
-                    _ => throw new QuicDatagramException("Unknown datagram send state.", (int)state)
-                };
+                    Marshal.FreeHGlobal(quicBuffers);
+                    throw;
+                }
             }
-            finally
+            catch (Exception ex)
             {
-                quicBufferHandle.Free();
-                tcsHandle.Free();
+                callbackHandle.Free();
+                sent.SetException(ex);
             }
+            return sent.Task;
         }
 
         private void ThrowIfDisposed()

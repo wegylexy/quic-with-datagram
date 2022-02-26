@@ -14,6 +14,11 @@ namespace System.Net.Quic
         public System.Net.EndPoint? RemoteEndPoint { get { throw null; } set { } }
     }
     public delegate void QuicDatagramReceivedEventHandler(object sender, ReadOnlySpan<byte> buffer);
+    public sealed class QuicDatagramSendingResult
+    {
+        public System.Threading.Tasks.Task Completion { get { throw null; } }
+        public System.Threading.Tasks.Task LostSuspect { get { throw null; } }
+    }
     public sealed partial class QuicConnection : System.IDisposable
     {
         public QuicConnection(System.Net.EndPoint remoteEndPoint, System.Net.Security.SslClientAuthenticationOptions? sslClientAuthenticationOptions, System.Net.IPEndPoint? localEndPoint = null) { }
@@ -39,17 +44,13 @@ namespace System.Net.Quic
         public bool DatagramSendEnabled { get { throw null; } set { } }
         public int DatagramMaxSendLength { get { throw null; } }
         public event QuicDatagramReceivedEventHandler? DatagramReceived { add { } remove { } }
-        public System.Threading.Tasks.ValueTask<bool> SendDatagramAsync(ReadOnlyMemory<byte> buffer, bool priority = false) { throw null; }
+        public System.Threading.Tasks.Task<QuicDatagramSendingResult> SendDatagramAsync(ReadOnlyMemory<byte> buffer, bool priority = false) { throw null; }
+        public System.Threading.Tasks.Task<QuicDatagramSendingResult> SendDatagramAsync(System.Buffers.ReadOnlySequence<byte> buffers, bool priority = false) { throw null; }
     }
     public partial class QuicConnectionAbortedException : System.Net.Quic.QuicException
     {
         public QuicConnectionAbortedException(string message, long errorCode) : base (default(string)) { }
         public long ErrorCode { get { throw null; } }
-    }
-    public partial class QuicDatagramException : System.Net.Quic.QuicException
-    {
-        public QuicDatagramException(string message, int errorCode) : base(default(string)) { }
-        public int ErrorCode { get { throw null; } }
     }
     public partial class QuicException : System.Exception
     {
