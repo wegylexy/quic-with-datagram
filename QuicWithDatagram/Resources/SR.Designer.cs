@@ -61,11 +61,74 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only IPv4 or IPv6 are supported.
+        ///   Looks up a localized string similar to Authentication failed because the remote party sent a TLS alert: &apos;{0}&apos;..
         /// </summary>
-        internal static string net_quic_addressfamily_notsupported {
+        internal static string net_auth_tls_alert {
             get {
-                return ResourceManager.GetString("net_quic_addressfamily_notsupported", resourceCulture);
+                return ResourceManager.GetString("net_auth_tls_alert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The AddressFamily {0} is not valid for the {1} end point, use {2} instead..
+        /// </summary>
+        internal static string net_InvalidAddressFamily {
+            get {
+                return ResourceManager.GetString("net_InvalidAddressFamily", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The supplied {0} is an invalid size for the {1} end point..
+        /// </summary>
+        internal static string net_InvalidSocketAddressSize {
+            get {
+                return ResourceManager.GetString("net_InvalidSocketAddressSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This method may not be called when another {0} operation is pending..
+        /// </summary>
+        internal static string net_io_invalidnestedcall {
+            get {
+                return ResourceManager.GetString("net_io_invalidnestedcall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QuicConnection is configured to not accept any streams..
+        /// </summary>
+        internal static string net_quic_accept_not_allowed {
+            get {
+                return ResourceManager.GetString("net_quic_accept_not_allowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application layer protocol negotiation error was encountered..
+        /// </summary>
+        internal static string net_quic_alpn_neg_error {
+            get {
+                return ResourceManager.GetString("net_quic_alpn_neg_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication failed: {0}..
+        /// </summary>
+        internal static string net_quic_auth {
+            get {
+                return ResourceManager.GetString("net_quic_auth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User configured callback failed..
+        /// </summary>
+        internal static string net_quic_callback_error {
+            get {
+                return ResourceManager.GetString("net_quic_callback_error", resourceCulture);
             }
         }
         
@@ -88,6 +151,24 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The connection timed out from inactivity..
+        /// </summary>
+        internal static string net_quic_connection_idle {
+            get {
+                return ResourceManager.GetString("net_quic_connection_idle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server refused the connection..
+        /// </summary>
+        internal static string net_quic_connection_refused {
+            get {
+                return ResourceManager.GetString("net_quic_connection_refused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection aborted by peer ({0})..
         /// </summary>
         internal static string net_quic_connectionaborted {
@@ -97,11 +178,92 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connection is not connected..
+        ///   Looks up a localized string similar to CipherSuitePolicy must specify at least one cipher supported by QUIC..
         /// </summary>
-        internal static string net_quic_not_connected {
+        internal static string net_quic_empty_cipher_suite {
             get {
-                return ResourceManager.GetString("net_quic_not_connected", resourceCulture);
+                return ResourceManager.GetString("net_quic_empty_cipher_suite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection handshake was canceled due to the configured timeout of {0} seconds elapsing..
+        /// </summary>
+        internal static string net_quic_handshake_timeout {
+            get {
+                return ResourceManager.GetString("net_quic_handshake_timeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos;&apos; should be within [0, {1}) range..
+        /// </summary>
+        internal static string net_quic_in_range {
+            get {
+                return ResourceManager.GetString("net_quic_in_range", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An internal error has occurred. {0}.
+        /// </summary>
+        internal static string net_quic_internal_error {
+            get {
+                return ResourceManager.GetString("net_quic_internal_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be specified to accept the connection..
+        /// </summary>
+        internal static string net_quic_not_null_accept_connection {
+            get {
+                return ResourceManager.GetString("net_quic_not_null_accept_connection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server must provide a certificate in &apos;{0}&apos; or &apos;{1}&apos; or via &apos;{2}&apos; for the connection..
+        /// </summary>
+        internal static string net_quic_not_null_ceritifcate {
+            get {
+                return ResourceManager.GetString("net_quic_not_null_ceritifcate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be specified to start the listener..
+        /// </summary>
+        internal static string net_quic_not_null_listener {
+            get {
+                return ResourceManager.GetString("net_quic_not_null_listener", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be specified and contain at least one item to establish the connection..
+        /// </summary>
+        internal static string net_quic_not_null_not_empty_connection {
+            get {
+                return ResourceManager.GetString("net_quic_not_null_not_empty_connection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be specified and contain at least one item to start the listener..
+        /// </summary>
+        internal static string net_quic_not_null_not_empty_listener {
+            get {
+                return ResourceManager.GetString("net_quic_not_null_not_empty_listener", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be specified to open the connection..
+        /// </summary>
+        internal static string net_quic_not_null_open_connection {
+            get {
+                return ResourceManager.GetString("net_quic_not_null_open_connection", resourceCulture);
             }
         }
         
@@ -115,20 +277,29 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A QUIC protocol error was encountered.
+        /// </summary>
+        internal static string net_quic_protocol_error {
+            get {
+                return ResourceManager.GetString("net_quic_protocol_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading has been aborted on the stream..
+        /// </summary>
+        internal static string net_quic_reading_aborted {
+            get {
+                return ResourceManager.GetString("net_quic_reading_aborted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reading is not allowed on stream..
         /// </summary>
         internal static string net_quic_reading_notallowed {
             get {
                 return ResourceManager.GetString("net_quic_reading_notallowed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sending has already been aborted on the stream.
-        /// </summary>
-        internal static string net_quic_sending_aborted {
-            get {
-                return ResourceManager.GetString("net_quic_sending_aborted", resourceCulture);
             }
         }
         
@@ -151,7 +322,7 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connection timed out..
+        ///   Looks up a localized string similar to Connection timed out waiting for a response from the peer..
         /// </summary>
         internal static string net_quic_timeout {
             get {
@@ -169,11 +340,38 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported address family of &apos;{0}&apos; for remote endpoint..
+        ///   Looks up a localized string similar to Could not use a TLS version required by Quic. TLS 1.3 may have been disabled in the registry..
         /// </summary>
-        internal static string net_quic_unsupported_address_family {
+        internal static string net_quic_tls_version_notsupported {
             get {
-                return ResourceManager.GetString("net_quic_unsupported_address_family", resourceCulture);
+                return ResourceManager.GetString("net_quic_tls_version_notsupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; in not supported remote endpoint type, expected IP or DNS endpoint.&quot;.
+        /// </summary>
+        internal static string net_quic_unsupported_endpoint_type {
+            get {
+                return ResourceManager.GetString("net_quic_unsupported_endpoint_type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A version negotiation error was encountered..
+        /// </summary>
+        internal static string net_quic_ver_neg_error {
+            get {
+                return ResourceManager.GetString("net_quic_ver_neg_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writing has been aborted on the stream..
+        /// </summary>
+        internal static string net_quic_writing_aborted {
+            get {
+                return ResourceManager.GetString("net_quic_writing_aborted", resourceCulture);
             }
         }
         
@@ -187,16 +385,7 @@ namespace System.Net.Quic {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The application protocol list is invalid..
-        /// </summary>
-        internal static string net_ssl_app_protocols_invalid {
-            get {
-                return ResourceManager.GetString("net_ssl_app_protocols_invalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to System.Net.Quic is not supported on this platform..
+        ///   Looks up a localized string similar to System.Net.Quic is not supported on this platform: {0}.
         /// </summary>
         internal static string SystemNetQuic_PlatformNotSupported {
             get {

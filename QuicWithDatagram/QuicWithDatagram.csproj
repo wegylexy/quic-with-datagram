@@ -1,14 +1,14 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<RuntimeIdentifiers>win;linux;osx</RuntimeIdentifiers>
 		<ExtrasBuildEachRuntimeIdentifier>true</ExtrasBuildEachRuntimeIdentifier>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AssemblyName>FlyByWireless.Quic</AssemblyName>
-		<VersionSuffix>alpha.4</VersionSuffix>
+		<VersionSuffix>alpha.5</VersionSuffix>
 		<Authors>WONG Tin Chi Timothy</Authors>
 		<Product>MsQuic Wrapper with Datagram</Product>
 		<Title>$(Product)</Title>
@@ -26,17 +26,6 @@
 	<ItemGroup>
 		<None Include="../LICENSE" Pack="true" PackagePath="" />
 		<ReferenceAssemblyProjectReference Include="../ref/QuicWithDatagram/QuicWithDatagram.csproj" />
-		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.Windows.cs" Condition="'$(RuntimeIdentifier)' != 'win'" />
-		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.Linux.cs" Condition="'$(RuntimeIdentifier)' != 'linux'" />
-		<Compile Remove="Implementations/MsQuic/Interop/MsQuicStatusCodes.OSX.cs" Condition="'$(RuntimeIdentifier)' != 'osx'" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="Resources/SR.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>SR.resx</DependentUpon>
-		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -103,5 +92,11 @@
 			<PackageCopyToOutput>True</PackageCopyToOutput>
 			<PackagePath>runtimes/osx-x64/native/</PackagePath>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Resources\SR.Designer.cs">
+	    <DependentUpon>SR.resx</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 </Project>
