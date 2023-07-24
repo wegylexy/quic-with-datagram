@@ -4,10 +4,12 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Quic;
 using static Microsoft.Quic.MsQuic;
+#if NET8_0_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
 
 namespace System.Net.Quic;
 
@@ -40,7 +42,12 @@ internal static class MsQuicHelpers
         .GetType("System.Net.Quic.MsQuicHelpers")!
         .GetMethod(nameof(ToIPEndPoint), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static readonly Type _QuicAddr = _ToIPEndPoint.GetParameters()[0].ParameterType.GetElementType()!;
-    private static readonly MethodInfo _Unsafe_BitCast_QuicAddr = typeof(Unsafe).GetMethod(nameof(Unsafe.BitCast))!
+    private static readonly MethodInfo _Unsafe_BitCast_QuicAddr =
+#if NET8_0_OR_GREATER
+        typeof(Unsafe).GetMethod(nameof(Unsafe.BitCast))!
+#else
+        typeof(FlyByWireless.Net8Unsafe).GetMethod(nameof(FlyByWireless.Net8Unsafe.BitCast))!
+#endif
         .MakeGenericMethod(typeof(QuicAddr), _QuicAddr);
     internal static unsafe IPEndPoint ToIPEndPoint(this ref QuicAddr quicAddress, AddressFamily? addressFamilyOverride = null)
     {

@@ -8,6 +8,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Microsoft.Quic;
 using static Microsoft.Quic.MsQuic;
+#if !NET8_0_OR_GREATER
+using System.Reflection;
+#endif
 
 namespace System.Net.Quic;
 
@@ -73,6 +76,12 @@ internal static class MsQuicConfiguration
         return Create(options, flags, certificate, null, authenticationOptions.ApplicationProtocols, authenticationOptions.CipherSuitesPolicy, authenticationOptions.EncryptionPolicy);
     }
 
+#if !NET8_0_OR_GREATER
+    private static readonly FieldInfo _Certificate = typeof(SslStreamCertificateContext)
+        .GetField("Certificate", BindingFlags.NonPublic | BindingFlags.Instance)!;
+    private static readonly FieldInfo _IntermediateCertificates = typeof(SslStreamCertificateContext)
+        .GetField("IntermediateCertificates", BindingFlags.NonPublic | BindingFlags.Instance)!;
+#endif
     public static MsQuicSafeHandle Create(QuicServerConnectionOptions options, string? targetHost)
     {
         SslServerAuthenticationOptions authenticationOptions = options.ServerAuthenticationOptions;
@@ -89,8 +98,13 @@ internal static class MsQuicConfiguration
         ReadOnlyCollection<X509Certificate2>? intermediates = default;
         if (authenticationOptions.ServerCertificateContext is not null)
         {
+#if NET8_0_OR_GREATER
             certificate = authenticationOptions.ServerCertificateContext.TargetCertificate;
             intermediates = authenticationOptions.ServerCertificateContext.IntermediateCertificates;
+#else
+            certificate = (X509Certificate2?)_Certificate.GetValue(authenticationOptions.ServerCertificateContext);
+            intermediates = ((X509Certificate2[]?)_IntermediateCertificates.GetValue(authenticationOptions.ServerCertificateContext))?.AsReadOnly();
+#endif
         }
 
         certificate ??= authenticationOptions.ServerCertificate ?? authenticationOptions.ServerCertificateSelectionCallback?.Invoke(authenticationOptions, targetHost);

@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 using Microsoft.Quic;
 using static System.Net.Quic.MsQuicHelpers;
 using static Microsoft.Quic.MsQuic;
+#if !NET8_0_OR_GREATER
+using System.Reflection;
+#endif
 
 using NEW_CONNECTION_DATA = Microsoft.Quic.QUIC_LISTENER_EVENT._Anonymous_e__Union._NEW_CONNECTION_e__Struct;
 using STOP_COMPLETE_DATA = Microsoft.Quic.QUIC_LISTENER_EVENT._Anonymous_e__Union._STOP_COMPLETE_e__Struct;
@@ -280,6 +283,9 @@ public sealed partial class QuicListener : IAsyncDisposable
         }
     }
 
+#if !NET8_0_OR_GREATER
+    private static readonly ConstructorInfo _SslClientHelloInfo = typeof(SslClientHelloInfo).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, Type.EmptyTypes)!;
+#endif
     private unsafe int HandleEventNewConnection(ref NEW_CONNECTION_DATA data)
     {
         // Check if there's capacity to have another connection waiting to be accepted.
@@ -295,7 +301,14 @@ public sealed partial class QuicListener : IAsyncDisposable
         }
 
         QuicConnection connection = new QuicConnection(data.Connection, data.Info);
+#if NET8_0_OR_GREATER
         SslClientHelloInfo clientHello = new SslClientHelloInfo(data.Info->ServerNameLength > 0 ? Marshal.PtrToStringUTF8((IntPtr)data.Info->ServerName, data.Info->ServerNameLength) : "", SslProtocols.Tls13);
+#else
+        SslClientHelloInfo clientHello = (SslClientHelloInfo)_SslClientHelloInfo.Invoke(new object[]{
+            data.Info->ServerNameLength > 0 ? Marshal.PtrToStringUTF8((IntPtr)data.Info->ServerName, data.Info->ServerNameLength) : "",
+            SslProtocols.Tls13
+        });
+#endif
 
         // Kicks off the rest of the handshake in the background, the process itself will enqueue the result in the accept queue.
         StartConnectionHandshake(connection, clientHello);

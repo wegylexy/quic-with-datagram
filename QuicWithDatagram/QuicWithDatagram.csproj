@@ -1,14 +1,14 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>net7.0;net8.0</TargetFrameworks>
 		<RuntimeIdentifiers>win;linux;osx</RuntimeIdentifiers>
 		<ExtrasBuildEachRuntimeIdentifier>true</ExtrasBuildEachRuntimeIdentifier>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AssemblyName>FlyByWireless.Quic</AssemblyName>
-		<VersionSuffix>alpha.5</VersionSuffix>
+		<VersionSuffix>alpha.6</VersionSuffix>
 		<Authors>WONG Tin Chi Timothy</Authors>
 		<Product>MsQuic Wrapper with Datagram</Product>
 		<Title>$(Product)</Title>
@@ -95,8 +95,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Resources\SR.Designer.cs">
-	    <DependentUpon>SR.resx</DependentUpon>
-	  </Compile>
+		<Compile Update="Resources\SR.Designer.cs">
+			<DependentUpon>SR.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 </Project>
